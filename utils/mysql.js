@@ -69,7 +69,7 @@ function createTables() {
      */
     connection.query(`CREATE TABLE IF NOT EXISTS ${userTabel}(
         id INT NOT NULL AUTO_INCREMENT,
-        phone TEXT NOT NULL,
+        username TEXT NOT NULL,
         password TEXT NOT NULL,
         PRIMARY KEY ( id )) DEFAULT CHARSET=utf8;`, function(error){
         if (error) throw error;

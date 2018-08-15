@@ -7,12 +7,12 @@ var jwt = require('jsonwebtoken');
 const tokenValidTime = 60 * 60 * 24 * 7;
 
 router.post('/', function(req, res, next) {
-    const phone = req.body.phone;
+    const username = req.body.username;
     const pwd = req.body.pwd;
-    mysql.query(`select * from user where phone='${phone}'`, function(err, results){
+    mysql.query(`select * from user where username='${username}'`, function(err, results){
         // console.log(results);
         if (results.length === 0) {
-            mysql.query(`insert into user (phone, password) values ('${phone}','${pwd}')`, function(err){
+            mysql.query(`insert into user (username, password) values ('${username}','${pwd}')`, function(err){
                 if (err) {
                     console.log(err);
                     res.json({status:0});
@@ -22,9 +22,9 @@ router.post('/', function(req, res, next) {
                 mysql.query(`SELECT LAST_INSERT_ID()`, function(err, results){
                     const user_id = results[0]['LAST_INSERT_ID()'];
                     const data = {
-                        phone: phone,
+                        username: username,
                         token: jwt.sign({
-                                    phone: phone,
+                                    username: username,
                                     user_id: user_id,
                                 }, 'qwer1qaz', {
                                     expiresIn: tokenValidTime
@@ -36,9 +36,9 @@ router.post('/', function(req, res, next) {
         } else {
             if (results[0].password === pwd) {
                 const data = {
-                    phone: results[0].phone,
+                    username: results[0].username,
                     token: jwt.sign({
-                                phone: phone,
+                                username: username,
                                 user_id: results[0].id
                             }, 'qwer1qaz', {
                                 expiresIn: tokenValidTime
