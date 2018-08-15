@@ -11,14 +11,12 @@
     "commit": "git add . && git-cz && git push"
   },
   "dependencies": {
-    "@google-cloud/translate": "^1.1.0",
     "axios": "^0.18.0",
     "cookie-parser": "~1.4.3",
     "cors": "^2.8.4",
     "debug": "~2.6.9",
     "express": "~4.16.0",
     "express-jwt": "^5.3.1",
-    "google-translate-api": "^2.3.0",
     "http-errors": "~1.6.2",
     "jsonwebtoken": "^8.3.0",
     "md5": "^2.2.1",
