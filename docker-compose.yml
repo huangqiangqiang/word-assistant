@@ -1,0 +1,22 @@
+version: '2'
+services:
+    app:
+        build: .
+        ports:
+            - 8080:3001
+        links:
+            - mysql
+        volumes:
+            - /data/word-assistant:/usr/src/app/public
+
+    mysql:
+        image: mysql:5.6
+        ports:
+            - "3306:3306"
+        expose:
+            - "3306"
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+        volumes:
+            - /data/mysql:/var/lib/mysql
+            - /data/mysql/mysql.cfg:/etc/mysql/conf.d/mysql.cfg
