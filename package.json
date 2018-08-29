@@ -7,6 +7,7 @@
     "list": "pm2 list",
     "stop": "pm2 stop www",
     "delete": "pm2 delete www",
+    "info": "pm2 show www",
     "deploy": "sh scripts/deploy.sh",
     "commit": "git add . && git-cz && git push"
   },

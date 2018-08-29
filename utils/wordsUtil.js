@@ -7,6 +7,7 @@ var tool = {
                 const item = results[0];
                 results[0].baseInfo = JSON.parse(item.baseInfo);
                 results[0].raw = JSON.parse(item.raw);
+                results[0].extends = item.extends.replace("#DYH#","'");
             }
             cb && cb(err, results[0]);
         });
@@ -29,7 +30,7 @@ var tool = {
         });
     },
     update: (word, cb) => {
-        mysql.query(`UPDATE word SET extends='${word.extends}' WHERE text='${word.text}'`, (err) => {
+        mysql.query(`UPDATE word SET extends='${word.extends.replace("'","#DYH#")}' WHERE text='${word.text}'`, (err) => {
             if (err) {
                 cb && cb(err, null);
                 return;
