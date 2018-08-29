@@ -8,7 +8,9 @@ router.get('/', function(req, res, next) {
         for (let i = 0; i < results.length; i++) {
             const item = results[i];
             results[i].baseInfo = JSON.parse(item.baseInfo.replace("#DYH#","'"));
-            results[i].extends = item.extends.replace("#DYH#","'");
+            if (item.extends) {
+                results[i].extends = item.extends.replace("#DYH#","'");
+            }
         }
         res.json({status:1,data:results});
     })

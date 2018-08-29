@@ -7,7 +7,9 @@ var tool = {
                 const item = results[0];
                 results[0].baseInfo = JSON.parse(item.baseInfo);
                 results[0].raw = JSON.parse(item.raw);
-                results[0].extends = item.extends.replace("#DYH#","'");
+                if (item.extends) {
+                    results[0].extends = item.extends.replace("#DYH#","'");
+                }
             }
             cb && cb(err, results[0]);
         });
