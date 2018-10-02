@@ -20,6 +20,7 @@ module.exports = {
           }
           const parts = symbol.parts;
           result = {
+            text: text,
             baseInfo: {
               src: text,
               dst: parts[0].means[0],

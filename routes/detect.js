@@ -1,26 +1,33 @@
-var express = require('express');
-var router = express.Router();
-var mysql = require('./../utils/mysql');
+const express = require('express');
+const router = express.Router();
+var mongoModels = require('../utils/mongoUtil');
+
+const ListModel = mongoModels.list;
+const WordModel = mongoModels.word;
 
 router.get('/', function (req, res, next) {
-  console.log(req.query);
   /**
    * 先取出当前用户所有的id
    */
-  mysql.query(`select * from history, word where history.word_id = word.id and user_id=${req.user.user_id}`, function (err, results) {
+  const { user_id } = req.user;
+  ListModel.find({user_id:user_id}).populate({path: 'word_id', model: WordModel, select: '_id text baseInfo'}).exec(function(err, docs) {
+    let wordList = docs.map((item) => {
+      return item.word_id;
+    });
     let count = parseInt(req.query.count, 10)
     if (count >= results.length) {
       count = results.length;
     }
-    for (let i = 0; i < results.length; i++) {
-      const item = results[i];
-      results[i].baseInfo = JSON.parse(item.baseInfo.replace("#DYH#", "'"));
-    }
     resultArr = getRandomArrayElements(results, count);
-    res.json({ status: 1, data: resultArr });
-  })
+    res.json({status:1, data: resultArr});
+  });
 });
 
+/**
+ * 从arr数组里随机取count个元素
+ * @param {*} arr 
+ * @param {*} count 
+ */
 function getRandomArrayElements(arr, count) {
   var shuffled = arr.slice(0), i = arr.length, min = i - count, temp, index;
   while (i-- > min) {

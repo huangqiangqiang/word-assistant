@@ -1,55 +1,59 @@
 var express = require('express');
 var router = express.Router();
-var mysql = require('./../utils/mysql');
+var mongoModels = require('../utils/mongoUtil');
 var jwt = require('jsonwebtoken');
+
+const UserModel = mongoModels.user;
 
 // 7天
 const tokenValidTime = 60 * 60 * 24 * 7;
 
 router.post('/', function (req, res, next) {
   const username = req.body.username;
-  const pwd = req.body.pwd;
-  mysql.query(`select * from user where username='${username}'`, function (err, results) {
-    // console.log(results);
-    if (results.length === 0) {
-      mysql.query(`insert into user (username, password) values ('${username}','${pwd}')`, function (err) {
-        if (err) {
-          console.log(err);
-          res.json({ status: 0 });
-          return;
-        }
-        // 获取最近插入数据的id
-        mysql.query(`SELECT LAST_INSERT_ID()`, function (err, results) {
-          const user_id = results[0]['LAST_INSERT_ID()'];
-          const data = {
-            username: username,
-            token: jwt.sign({
-              username: username,
-              user_id: user_id,
-            }, 'qwer1qaz', {
-                expiresIn: tokenValidTime
-              })
-          }
-          res.json({ status: 1, data: data });
-        })
-      })
-    } else {
-      if (results[0].password === pwd) {
+  const password = req.body.pwd;
+  UserModel.find({username: username}, (err, docs) => {
+    if (docs.length == 0) {
+      UserModel({username, password}).save((err, doc) => {
         const data = {
-          username: results[0].username,
+          username: username,
           token: jwt.sign({
             username: username,
-            user_id: results[0].id
+            user_id: doc._id,
           }, 'qwer1qaz', {
               expiresIn: tokenValidTime
             })
         }
-        res.json({ status: 1, data: data });
+        res.json({
+          status:1,
+          data,
+          message:'注册成功！'
+        });
+      });
+    } else {
+      const doc = docs[0];
+      const data = {
+        username: username,
+        token: jwt.sign({
+          username: username,
+          user_id: doc._id,
+        }, 'qwer1qaz', {
+            expiresIn: tokenValidTime
+          })
+      }
+      if (password === doc.password) {
+        res.json({
+          status: 1,
+          data,
+          message: '登录成功',
+        })
       } else {
-        res.json({ status: 0, message: '密码错误！' });
+        res.json({
+          status: 0,
+          message: '密码错误',
+        })
       }
     }
-  })
+  });
 });
 
 module.exports = router;

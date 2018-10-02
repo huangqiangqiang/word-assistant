@@ -1,3 +1,4 @@
+require('dotenv').config();
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
@@ -6,6 +7,7 @@ var logger = require('morgan');
 var cors = require('cors');
 var jwt = require('express-jwt');
 var favicon = require('serve-favicon');
+const mongo = require('./utils/mongo');
 
 var indexRouter = require('./routes/index');
 var translateRouter = require('./routes/translate');
@@ -14,6 +16,9 @@ var historyRouter = require('./routes/history');
 var detectRouter = require('./routes/detect');
 
 var app = express();
+
+// 链接mongodb
+mongo();
 
 // cors
 app.use(cors());
