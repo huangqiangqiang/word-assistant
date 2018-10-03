@@ -10,15 +10,17 @@ router.get('/', function (req, res, next) {
    * 先取出当前用户所有的id
    */
   const { user_id } = req.user;
-  ListModel.find({user_id:user_id}).populate({path: 'word_id', model: WordModel, select: '_id text baseInfo'}).exec(function(err, docs) {
+  let { count } = req.query;
+  ListModel.find({user_id:user_id}).populate({path: 'word_id', model: WordModel}).exec(function(err, docs) {
+    console.log(docs);
     let wordList = docs.map((item) => {
       return item.word_id;
     });
-    let count = parseInt(req.query.count, 10)
-    if (count >= results.length) {
-      count = results.length;
+    count = parseInt(count, 10)
+    if (count >= wordList.length) {
+      count = wordList.length;
     }
-    resultArr = getRandomArrayElements(results, count);
+    resultArr = getRandomArrayElements(wordList, count);
     res.json({status:1, data: resultArr});
   });
 });
