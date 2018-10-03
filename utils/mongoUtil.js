@@ -5,7 +5,6 @@ var WordSchema = mongoose.Schema({
   create_time: String,
   extends: Object,
   query_times: String,
-  raw: Object,
   text: String,
   id: String,
 });

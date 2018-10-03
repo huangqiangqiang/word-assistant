@@ -2,7 +2,6 @@ var mongoose = require('mongoose');
 
 module.exports = function () {
   // 创建数据库链接
-  console.log('process.env.DB_HOST',process.env.DB_HOST);
   mongoose.connect(process.env.DB_HOST, { useNewUrlParser: true });
   var db = mongoose.connection;
 

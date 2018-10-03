@@ -30,7 +30,6 @@ module.exports = {
                 am_mp3: symbol.ph_am_mp3,
               }
             },
-            raw: data,
           };
         } else {
           // translate_type === 2
@@ -39,7 +38,6 @@ module.exports = {
               src: text,
               dst: data.baesInfo.translate_result,
             },
-            raw: data,
           };
         }
         cb && cb(null, result);

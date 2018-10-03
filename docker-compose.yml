@@ -6,8 +6,9 @@ services:
       - 8080:3001
     links:
       - mongo
-    # volumes:
-    #   - /data/word-assistant:/usr/src/app/public
+    volumes:
+      - /data/word-assistant:/usr/src/app/public
+    restart: always
     
   mongo:
     image: mongo:latest
