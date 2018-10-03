@@ -3,7 +3,7 @@ var mongoose = require('mongoose');
 var WordSchema = mongoose.Schema({
   baseInfo: Object,
   create_time: String,
-  extends: Object,
+  expand: Object,
   query_times: String,
   text: String,
   id: String,

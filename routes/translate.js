@@ -55,9 +55,9 @@ module.exports = router.post('/', function (req, res, next) {
 
 // 更新单词
 module.exports = router.put('/', function (req, res, next) {
-  const { text, content } = req.body;
+  const { text, expand } = req.body;
   wordsUtil.get(text, function (err, word) {
-    word.extends = content;
+    word.expand = expand;
     wordsUtil.update(word, function (err, word) {
       res.json({ status: 1, data: word });
     });
