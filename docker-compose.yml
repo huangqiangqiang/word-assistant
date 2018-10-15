@@ -3,12 +3,33 @@ services:
   app:
     build: .
     ports:
-      - 8080:3001
+      - 3000:8080
     links:
       - mongo
-    volumes:
-      - /data/word-assistant:/usr/src/app/public
     restart: always
+
+  nginx_static:
+    image: nginx:latest
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /data/word-assistant/html:/usr/share/nginx/html
+      - /data/word-assistant/nginx/conf.d:/etc/nginx/conf.d
+      - /data/word-assistant/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - /root/ssl:/root/ssl
+
+  nginx_node:
+    image: nginx:latest
+    ports:
+      - "8080:80"
+      - "8443:443"
+    volumes:
+      - /data/word-assistant/nginx_node/conf.d:/etc/nginx/conf.d
+      - /data/word-assistant/nginx_node/nginx.conf:/etc/nginx/nginx.conf
+      - /root/ssl:/root/ssl
+    volumes_from:
+      - app
     
   mongo:
     image: mongo:latest
@@ -17,4 +38,4 @@ services:
     expose:
       - "27017"
     volumes:
-      - /data/word-assistant-db:/data/db
+      - /data/word-assistant/db:/data/db
