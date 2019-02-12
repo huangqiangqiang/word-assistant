@@ -1,53 +1,53 @@
 var axios = require('axios');
 
 module.exports = {
-    translate: function(text, cb) {
-        const timestamp = new Date().getTime();
-        const url = `http://www.iciba.com/index.php?a=getWordMean&c=search&word=${text}&_=${timestamp}&callback=jsonp4`;
-        axios.get(url)
-        .then((res)=>{
-            const data = eval(res.data);
-            if (data.errno === 404) {
-                cb && cb({status:0, message:data.errmsg}, null);
-                return;
-            }
-            let result = {};
-            if (data.baesInfo.translate_type === 1) {
-                let symbol = {};
-                // symbols 字段可能没有
-                if (data.baesInfo.symbols && data.baesInfo.symbols.length !== 0) {
-                    symbol = data.baesInfo.symbols[0];
-                }
-                const parts = symbol.parts;
-                result = {
-                    baseInfo: {
-                        src: text,
-                        dst: parts[0].means[0],
-                        dst_info: parts,
-                        voice: {
-                            am: symbol.ph_am,
-                            am_mp3: symbol.ph_am_mp3,
-                        }
-                    },
-                    raw: data,
-                };
-            } else {
-                // translate_type === 2
-                result = {
-                    baseInfo: {
-                        src: text,
-                        dst: data.baesInfo.translate_result,
-                    },
-                    raw: data,
-                };
-            }
-            cb && cb(null, result);
-        })
-        .catch((e)=>{
-            console.log(e);
-            // cb && cb(e, null);
-        });
-    }
+  translate: function (text, cb) {
+    const timestamp = new Date().getTime();
+    const url = `http://www.iciba.com/index.php?a=getWordMean&c=search&word=${text}&_=${timestamp}&callback=jsonp4`;
+    axios.get(url)
+      .then((res) => {
+        const data = eval(res.data);
+        if (data.errno === 404) {
+          cb && cb({ status: 0, message: data.errmsg }, null);
+          return;
+        }
+        let result = {};
+        let baseInfo = data.baesInfo;
+        if (baseInfo && baseInfo.translate_type === 1) {
+          let symbol = {};
+          // symbols 字段可能没有
+          if (baseInfo.symbols && baseInfo.symbols.length !== 0) {
+            symbol = baseInfo.symbols[0];
+          }
+          const parts = symbol.parts;
+          result = {
+            text: text,
+            baseInfo: {
+              src: text,
+              dst: parts[0].means[0],
+              dst_info: parts,
+              voice: {
+                am: symbol.ph_am,
+                am_mp3: symbol.ph_am_mp3,
+              }
+            },
+          };
+        } else {
+          // translate_type === 2
+          result = {
+            baseInfo: {
+              src: text,
+              dst: baseInfo.translate_result,
+            },
+          };
+        }
+        cb && cb(null, result);
+      })
+      .catch((e) => {
+        console.log(e);
+        // cb && cb(e, null);
+      });
+  }
 }
 
 /**
@@ -55,7 +55,7 @@ module.exports = {
  * @param {此方法是url中定义的，最好和官方的保持一致} data 
  */
 function jsonp4(data) {
-    return data;
+  return data;
 }
 
 // field: baseInfo

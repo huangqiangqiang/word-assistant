@@ -1,25 +1,29 @@
 var express = require('express');
 var router = express.Router();
-var mysql = require('./../utils/mysql');
+var mongoModels = require('../utils/mongoUtil');
 
-router.get('/', function(req, res, next) {
-    console.log(req.query);
-    mysql.query(`select * from history, word where history.word_id = word.id and user_id=${req.user.user_id} order by history.id desc LIMIT ${req.query.page * 50},50`, function(err, results){
-        for (let i = 0; i < results.length; i++) {
-            const item = results[i];
-            results[i].baseInfo = JSON.parse(item.baseInfo.replace("#DYH#","'"));
-        }
-        res.json({status:1,data:results});
-    })
+const ListModel = mongoModels.list;
+const WordModel = mongoModels.word;
+
+router.get('/', function (req, res, next) {
+  ListModel.find().populate({path: 'word_id', model: WordModel}).sort({create_time: -1}).exec((err, docs) => {
+    let wordList = docs.map((item) => {
+      return item.word_id;
+    });
+    res.json({status:1, data: wordList});
+  });
 });
 
-router.delete('/', function(req, res, next) {
-    if (!req.query.word_id) {
-        res.json({status:0,message:'word_id is nessisary!'});
-    }
-    mysql.query(`delete from history where user_id=${req.user.user_id} and word_id=${req.query.word_id}`, function(err, results){
-        res.json({status:1});
-    })
+router.delete('/', function (req, res, next) {
+  console.log(req.query);
+  const { word_id } = req.query;
+  const { user_id } = req.user;
+  if (!word_id) {
+    res.json({ status: 0, message: 'word_id is nessisary!' });
+  }
+  ListModel.remove({user_id: user_id, word_id: word_id}, (err, docs) => {
+    res.json({ status: 1 });
+  });
 });
 
 module.exports = router;

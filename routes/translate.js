@@ -2,19 +2,12 @@ var express = require('express');
 var router = express.Router();
 var translateUtil = require('../utils/translateUtil');
 var wordsUtil = require('../utils/wordsUtil');
-var historyUtil = require('../utils/historyTool');
-var mysql = require('./../utils/mysql');
+var mongoModels = require('../utils/mongoUtil');
 
-// 返回该用户的所有历史查询单词
-module.exports = router.get('/', function(req, res, next) {
-  translate.translate('hello world', (response, err)=>{
-    // console.log(response.data);
-    res.json(response.data.trans_result);
-  });
-});
+const ListModel = mongoModels.list;
 
 // 新增查询单词
-module.exports = router.post('/', function(req, res, next) {
+module.exports = router.post('/', function (req, res, next) {
   checkParams(req.body, res);
 
   const user = req.user;
@@ -28,32 +21,32 @@ module.exports = router.post('/', function(req, res, next) {
       translateLength += 1;
       continue;
     }
-    wordsUtil.get(text, function(err, word) {
+    wordsUtil.get(text, function (err, word) {
       if (word) {
         resultTranslate.push(word);
-        saveHistory(user, word);
-
         translateLength += 1;
         if (translateLength === queryArr.length) {
-          res.json({status:1,data:resultTranslate});
+          res.json({ status: 1, data: resultTranslate });
         }
       } else {
-        translateUtil.translate(text, (err, data)=>{
+        translateUtil.translate(text, (err, data) => {
           if (err) {
             console.log(err);
-            let resData = {status:0, message:'翻译出错'};
+            let resData = { status: 0, message: '翻译出错' };
             if (err.status === 0) {
               resData.message = err.message;
             }
             res.json(resData);
             return;
           }
-          saveHistory(user, data);
-          resultTranslate.push(data);
-          translateLength += 1;
-          if (translateLength === queryArr.length) {
-            res.json({status:1,data:resultTranslate});
-          }
+          wordsUtil.set(data, (err, savedWord) => {
+            saveHistory(user, savedWord);
+            resultTranslate.push(savedWord);
+            translateLength += 1;
+            if (translateLength === queryArr.length) {
+              res.json({ status: 1, data: resultTranslate });
+            }
+          });
         });
       }
     });
@@ -61,21 +54,14 @@ module.exports = router.post('/', function(req, res, next) {
 });
 
 // 更新单词
-module.exports = router.put('/', function(req, res, next) {
-  const { text, content } = req.body;
-  wordsUtil.get(text, function(err, word) {
-    word.extends = content;
-    console.log(word);
-    wordsUtil.update(word, function(err, word){
-      console.log('update',err);
-      res.json({status:1,data:word});
+module.exports = router.put('/', function (req, res, next) {
+  const { text, expand } = req.body;
+  wordsUtil.get(text, function (err, word) {
+    word.expand = expand;
+    wordsUtil.update(word, function (err, word) {
+      res.json({ status: 1, data: word });
     });
   });
-});
-
-// 删除查询单词
-module.exports = router.delete('/', function(req, res, next) {
-  res.json({result:1});
 });
 
 function checkParams(params, res) {
@@ -99,15 +85,18 @@ function checkParams(params, res) {
 function saveHistory(user, word) {
   const create_time = new Date().getTime();
   const query_times = 1;
-  // console.log('save history', word);
-  historyUtil.set({
-    user_id: user.user_id,
-    word_id: word.id,
-    create_time: create_time,
-    query_times: query_times,
-  }, function(err) {
-    if (err) {
-      console.log('add history table failure.', err);
+  ListModel.find({user_id: user.user_id, word_id: word._id}, (err, docs) => {
+    if (docs.length === 0) {
+      ListModel({
+        user_id: user.user_id,
+        word_id: word._id,
+        create_time: create_time,
+        query_times: query_times,
+      }).save((err, doc) => {
+        if (err) {
+          console.log('add list table failure.', err);
+        }
+      });
     }
   });
 }

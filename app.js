@@ -1,3 +1,4 @@
+require('dotenv').config();
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
@@ -5,6 +6,8 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var cors = require('cors');
 var jwt = require('express-jwt');
+var favicon = require('serve-favicon');
+const mongo = require('./utils/mongo');
 
 var indexRouter = require('./routes/index');
 var translateRouter = require('./routes/translate');
@@ -14,12 +17,17 @@ var detectRouter = require('./routes/detect');
 
 var app = express();
 
+// 链接mongodb
+mongo();
+
 // cors
 app.use(cors());
 
+// 浏览器会自动发起favicon.ico请求
+app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'pug');
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -52,7 +60,7 @@ app.use(function(err, req, res, next) {
 
   // render the error page
   res.status(err.status || 500);
-  res.render('error');
+  res.send('服务器异常！');
 });
 
 module.exports = app;

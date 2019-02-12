@@ -1,0 +1,14 @@
+{
+  "workbench.startupEditor": "welcomePage",
+  "window.zoomLevel": 0,
+  "explorer.confirmDelete": false,
+  "explorer.confirmDragAndDrop": false,
+  "cosmosDB.showSavePrompt": false,
+  "gitlab.instanceUrl": "https://mops-gitlab.lianluo.com/",
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "workbench.colorTheme": "Nova",
+  "editor.detectIndentation": false,
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+}
