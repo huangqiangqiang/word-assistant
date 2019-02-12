@@ -12,3 +12,7 @@ services:
     image: mongo:latest
     ports:
       - "10017:27017"
+    # expose:
+    #   - "27017"
+    volumes:
+      - /data/word-assistant/db:/data/db

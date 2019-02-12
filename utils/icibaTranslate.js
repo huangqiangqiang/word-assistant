@@ -12,11 +12,12 @@ module.exports = {
           return;
         }
         let result = {};
-        if (data.baesInfo.translate_type === 1) {
+        let baseInfo = data.baesInfo;
+        if (baseInfo && baseInfo.translate_type === 1) {
           let symbol = {};
           // symbols 字段可能没有
-          if (data.baesInfo.symbols && data.baesInfo.symbols.length !== 0) {
-            symbol = data.baesInfo.symbols[0];
+          if (baseInfo.symbols && baseInfo.symbols.length !== 0) {
+            symbol = baseInfo.symbols[0];
           }
           const parts = symbol.parts;
           result = {
@@ -36,7 +37,7 @@ module.exports = {
           result = {
             baseInfo: {
               src: text,
-              dst: data.baesInfo.translate_result,
+              dst: baseInfo.translate_result,
             },
           };
         }
