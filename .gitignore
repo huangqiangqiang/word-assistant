@@ -17,5 +17,6 @@ yarn-error.log*
 
 sql
 scripts
-deploy
+deploy/testing
+deploy/production
 .vscode
