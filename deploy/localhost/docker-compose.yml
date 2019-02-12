@@ -1,0 +1,14 @@
+version: '2'
+services:
+  server:
+    build: .
+    ports:
+      - 10080:3000
+    links:
+      - mongo
+    restart: always
+    
+  mongo:
+    image: mongo:latest
+    ports:
+      - "10017:27017"
